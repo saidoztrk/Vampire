@@ -33,13 +33,16 @@ class Game:
         # BASE PATH
         base_path = dirname(dirname(abspath(__file__)))
 
-        # Ses dosyaları tam yol
+        # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
         self.shoot_sound.set_volume(0.2)
         self.impact_sound = pygame.mixer.Sound(join(base_path, 'audio', 'impact.ogg'))
         self.music = pygame.mixer.Sound(join(base_path, 'audio', 'music.wav'))
         self.music.set_volume(0.5)
-        # self.music.play(loops=-1)
+
+        # Game over görseli
+        self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig', 'gameover.png')).convert_alpha()
+        self.game_over_image = pygame.transform.scale(self.game_over_image, (400, 150))  # Gerekirse boyutlandır
 
         self.load_images()
         self.setup()
@@ -108,10 +111,8 @@ class Game:
                 self.game_over = True
 
     def show_game_over_screen(self):
-        font = pygame.font.Font(None, 100)
-        text_surf = font.render("GAME OVER", True, (255, 0, 0))
-        text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-        self.display_surface.blit(text_surf, text_rect)
+        image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+        self.display_surface.blit(self.game_over_image, image_rect)
         pygame.display.update()
         pygame.time.wait(3000)
 
@@ -123,7 +124,13 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == self.enemy_event and not self.game_over:
-                    Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
+                    Enemy(
+                        choice(self.spawn_positions),
+                        choice(list(self.enemy_frames.values())),
+                        (self.all_sprites, self.enemy_sprites),
+                        self.player,
+                        self.collision_sprites
+                    )
 
             if not self.game_over:
                 self.gun_timer()
