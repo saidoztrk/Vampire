@@ -25,6 +25,7 @@ class Game:
         self.can_shoot = True
         self.shoot_time = 0
         self.gun_cooldown = 100
+        self.score = 0   # ekleme(skor)
 
         self.enemy_event = pygame.event.custom_type()
         pygame.time.set_timer(self.enemy_event, 300)
@@ -99,6 +100,7 @@ class Game:
                     self.impact_sound.play()
                     for sprite in collision_sprites:
                         sprite.destroy()
+                        self.score += 1    # ekleme(skor)
                     bullet.kill()
 
     def player_collision(self):
@@ -112,6 +114,12 @@ class Game:
         text_surf = font.render("GAME OVER", True, (255, 0, 0))
         text_rect = text_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
         self.display_surface.blit(text_surf, text_rect)
+
+        score_font = pygame.font.Font(None, 60)  #ekleme(game over altında skor yazdırır)
+        score_surf = score_font.render(f"Score: {self.score}", True, (255, 255, 255))   #ekleme(game over altında skor yazdırır)
+        score_rect = score_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 30))   #ekleme(game over altında skor yazdırır)
+        self.display_surface.blit(score_surf, score_rect)    #ekleme(game over altında skor yazdırır)
+
         pygame.display.update()
         pygame.time.wait(3000)
 
@@ -135,6 +143,11 @@ class Game:
                 self.display_surface.fill('black')
                 self.all_sprites.draw(self.player.rect.center)
                 self.player.draw_health_bar(self.display_surface)
+
+                font = pygame.font.Font(None, 36)      # ekleme(skor)
+                score_surf = font.render(f"Score: {self.score}", True, (255, 255, 255))    # ekleme(skor)
+                self.display_surface.blit(score_surf, (10, 10))        # ekleme(skor)
+
                 pygame.display.update()
             else:
                 self.show_game_over_screen()
