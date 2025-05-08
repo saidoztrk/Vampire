@@ -148,6 +148,8 @@ class Game:
                 self.running = False
 
         pygame.quit()
+        
+        
 
 
 if __name__ == '__main__':
