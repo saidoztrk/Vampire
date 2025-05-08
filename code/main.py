@@ -1,12 +1,13 @@
+import pygame
+import os
+from os.path import dirname, abspath, join
+from random import randint, choice
+from pytmx.util_pygame import load_pygame
 from settings import *
 from player import Player
 from sprites import *
-from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-from random import randint, choice
-from os.path import dirname, abspath, join
-import pygame
-import os
+
 
 class Game:
     def __init__(self):
@@ -17,23 +18,24 @@ class Game:
         self.running = True
         self.game_over = False
 
+        # Sprite grupları
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         self.bullet_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
 
+        # Ateş etme kontrolü
         self.can_shoot = True
         self.shoot_time = 0
-        self.gun_cooldown = 100
+        self.gun_cooldown = 100  # milisaniye
 
+        # Düşman doğma olayı
         self.enemy_event = pygame.event.custom_type()
         pygame.time.set_timer(self.enemy_event, 300)
         self.spawn_positions = []
 
-        # BASE PATH
+        # Sesler
         base_path = dirname(dirname(abspath(__file__)))
-
-        # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
         self.shoot_sound.set_volume(0.2)
         self.impact_sound = pygame.mixer.Sound(join(base_path, 'audio', 'impact.ogg'))
@@ -42,7 +44,7 @@ class Game:
 
         # Game over görseli
         self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig', 'gameover.png')).convert_alpha()
-        self.game_over_image = pygame.transform.scale(self.game_over_image, (400, 150))  # Gerekirse boyutlandır
+        self.game_over_image = pygame.transform.scale(self.game_over_image, (400, 150))
 
         self.load_images()
         self.setup()
@@ -50,11 +52,12 @@ class Game:
     def load_images(self):
         base_path = dirname(dirname(abspath(__file__)))
         self.bullet_surf = pygame.image.load(join(base_path, 'images', 'gun', 'bullet.png')).convert_alpha()
-        folders = list(walk(join(base_path, 'images', 'enemies')))[0][1]
+        folders = list(os.walk(join(base_path, 'images', 'enemies')))[0][1]
         self.enemy_frames = {}
+
         for folder in folders:
-            for folder_path, _, file_names in walk(join(base_path, 'images', 'enemies', folder)):
-                self.enemy_frames[folder] = []
+            self.enemy_frames[folder] = []
+            for folder_path, _, file_names in os.walk(join(base_path, 'images', 'enemies', folder)):
                 for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
                     full_path = join(folder_path, file_name)
                     surf = pygame.image.load(full_path).convert_alpha()
@@ -148,8 +151,6 @@ class Game:
                 self.running = False
 
         pygame.quit()
-        
-        
 
 
 if __name__ == '__main__':
