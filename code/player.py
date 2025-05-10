@@ -28,8 +28,13 @@ class Player(pygame.sprite.Sprite):
         self.health_bar_offset = pygame.Vector2(0, -40)
 
     def load_images(self):
+<<<<<<< HEAD
         frames = {'left': [], 'right': [], 'up': [], 'down': []}
         for state in frames.keys():
+=======
+        self.frames = {'left': [], 'right': [], 'up': [], 'down': []}
+        for state in self.frames.keys():
+>>>>>>> 637da21f40a06bd7de25519a42f209175a99b112
             for folder_path, _, file_names in walk(join('images', 'player', state)):
                 for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
                     full_path = join(folder_path, file_name)
