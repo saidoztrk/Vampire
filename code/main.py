@@ -9,7 +9,7 @@ import pygame
 import os
 
 class Game:
-    def __init__(self):  
+    def __init__(self):
         pygame.init()
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Survivor')
@@ -31,7 +31,7 @@ class Game:
         self.spawn_positions = []
 
         # BASE PATH
-        base_path = dirname(dirname(abspath(__file__)))  
+        base_path = dirname(dirname(abspath(__file__)))
 
         # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
@@ -48,25 +48,18 @@ class Game:
         self.setup()
 
     def load_images(self):
-        base_path = dirname(dirname(abspath(__file__)))  
+        base_path = dirname(dirname(abspath(__file__)))
         self.bullet_surf = pygame.image.load(join(base_path, 'images', 'gun', 'bullet.png')).convert_alpha()
         folders = list(os.walk(join(base_path, 'images', 'enemies')))[0][1]
         self.enemy_frames = {}
         for folder in folders:
             for folder_path, _, file_names in os.walk(join(base_path, 'images', 'enemies', folder)):
                 self.enemy_frames[folder] = []
-                for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
+                for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])): 
                     full_path = join(folder_path, file_name)
                     surf = pygame.image.load(full_path).convert_alpha()
                     self.enemy_frames[folder].append(surf)
 
-    def is_valid_spawn_position(self, spawn_pos):
-        """Düşmanın oyuncudan belirli bir mesafede doğup doğmadığını kontrol et"""
-        spawn_x, spawn_y = spawn_pos
-        player_x, player_y = self.player.rect.center
-        distance = ((spawn_x - player_x) ** 2 + (spawn_y - player_y) ** 2) ** 0.5
-        return distance >= 800  # En az 200 piksel uzaklıkta doğmalı
-a
     def input(self):
         if pygame.mouse.get_pressed()[0] and self.can_shoot:
             self.shoot_sound.play()
@@ -82,7 +75,7 @@ a
                 self.can_shoot = True
 
     def setup(self):
-        base_path = dirname(dirname(abspath(__file__)))  
+        base_path = dirname(dirname(abspath(__file__)))
         map = load_pygame(join(base_path, 'data', 'maps', 'world.tmx'))
 
         for x, y, image in map.get_layer_by_name('Ground').tiles():
@@ -94,13 +87,14 @@ a
         for obj in map.get_layer_by_name('Collisions'):
             CollisionSprite((obj.x, obj.y), pygame.Surface((obj.width, obj.height)), self.collision_sprites)
 
+        # Spawn pozisyonlarını filtreleme (600 piksel uzaklık)
         for obj in map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
                 self.gun = Gun(self.player, self.all_sprites)
             else:
-                # Geçerli spawn pozisyonlarını kontrol et ve ekle
-                if self.is_valid_spawn_position((obj.x, obj.y)):
+                # Spawn pozisyonunun 600 pikselden uzak olmasını sağlamak
+                if abs(obj.x - self.player.rect.centerx) >= 450 and abs(obj.y - self.player.rect.centery) >= 450:
                     self.spawn_positions.append((obj.x, obj.y))
 
     def bullet_collision(self):
@@ -133,16 +127,13 @@ a
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == self.enemy_event and not self.game_over:
-                    # Geçerli bir spawn pozisyonu seç
-                    valid_spawn = choice(self.spawn_positions) if self.spawn_positions else None
-                    if valid_spawn:
-                        Enemy(
-                            valid_spawn,
-                            choice(list(self.enemy_frames.values())),
-                            (self.all_sprites, self.enemy_sprites),
-                            player=self.player,
-                            collision_sprites=self.collision_sprites
-                        )
+                    Enemy(
+                        choice(self.spawn_positions),
+                        choice(list(self.enemy_frames.values())),
+                        (self.all_sprites, self.enemy_sprites),
+                        player=self.player,
+                        collision_sprites=self.collision_sprites
+                    )
 
             if not self.game_over:
                 self.gun_timer()
