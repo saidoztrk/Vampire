@@ -6,21 +6,16 @@ from os import walk
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
-
-        # Animasyon verileri
-        self.frames = self.load_images()
-        self.state = 'right'
-        self.frame_index = 0
-        self.image = self.frames[self.state][0]
+        self.load_images()
+        self.state, self.frame_index = 'right', 0
+        self.image = pygame.image.load(join('images', 'player', 'down', '0.png')).convert_alpha()
         self.rect = self.image.get_rect(center=pos)
         self.hitbox_rect = self.rect.inflate(-60, -90)
 
-        # Hareket ve çarpışma
         self.direction = pygame.Vector2()
         self.speed = 500
         self.collision_sprites = collision_sprites
 
-        # Sağlık
         self.max_health = 100
         self.health = self.max_health
         self.health_bar_length = 100
@@ -28,26 +23,19 @@ class Player(pygame.sprite.Sprite):
         self.health_bar_offset = pygame.Vector2(0, -40)
 
     def load_images(self):
-<<<<<<< HEAD
-        frames = {'left': [], 'right': [], 'up': [], 'down': []}
-        for state in frames.keys():
-=======
         self.frames = {'left': [], 'right': [], 'up': [], 'down': []}
         for state in self.frames.keys():
->>>>>>> 637da21f40a06bd7de25519a42f209175a99b112
             for folder_path, _, file_names in walk(join('images', 'player', state)):
                 for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
                     full_path = join(folder_path, file_name)
                     surf = pygame.image.load(full_path).convert_alpha()
-                    frames[state].append(surf)
-        return frames
+                    self.frames[state].append(surf)
 
     def input(self):
         keys = pygame.key.get_pressed()
         self.direction.x = int(keys[pygame.K_RIGHT] or keys[pygame.K_d]) - int(keys[pygame.K_LEFT] or keys[pygame.K_a])
         self.direction.y = int(keys[pygame.K_DOWN] or keys[pygame.K_s]) - int(keys[pygame.K_UP] or keys[pygame.K_w])
-        if self.direction.length_squared() > 0:
-            self.direction = self.direction.normalize()
+        self.direction = self.direction.normalize() if self.direction else self.direction
 
     def move(self, dt):
         self.hitbox_rect.x += self.direction.x * self.speed * dt
@@ -60,29 +48,20 @@ class Player(pygame.sprite.Sprite):
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(self.hitbox_rect):
                 if direction == 'horizontal':
-                    if self.direction.x > 0:
-                        self.hitbox_rect.right = sprite.rect.left
-                    elif self.direction.x < 0:
-                        self.hitbox_rect.left = sprite.rect.right
-                elif direction == 'vertical':
-                    if self.direction.y > 0:
-                        self.hitbox_rect.bottom = sprite.rect.top
-                    elif self.direction.y < 0:
-                        self.hitbox_rect.top = sprite.rect.bottom
+                    if self.direction.x > 0: self.hitbox_rect.right = sprite.rect.left
+                    if self.direction.x < 0: self.hitbox_rect.left = sprite.rect.right
+                else:
+                    if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
+                    if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
 
     def animate(self, dt):
         if self.direction.x != 0:
             self.state = 'right' if self.direction.x > 0 else 'left'
-        elif self.direction.y != 0:
+        if self.direction.y != 0:
             self.state = 'down' if self.direction.y > 0 else 'up'
 
-        if self.direction.length_squared() > 0:
-            self.frame_index += 5 * dt
-            self.frame_index %= len(self.frames[self.state])
-        else:
-            self.frame_index = 0
-
-        self.image = self.frames[self.state][int(self.frame_index)]
+        self.frame_index = self.frame_index + 5 * dt if self.direction else 0
+        self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
 
     def draw_health_bar(self, surface):
         health_ratio = self.health / self.max_health
@@ -96,7 +75,7 @@ class Player(pygame.sprite.Sprite):
 
     def take_damage(self, amount):
         self.health -= amount
-        if self.health <= 0:
+        if self.health < 0:
             self.health = 0
             self.kill()
 
