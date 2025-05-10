@@ -94,7 +94,7 @@ class Game:
                 self.gun = Gun(self.player, self.all_sprites)
             else:
                 # Spawn pozisyonunun 600 pikselden uzak olmasını sağlamak
-                if abs(obj.x - self.player.rect.centerx) >= 450 and abs(obj.y - self.player.rect.centery) >= 450:
+                if abs(obj.x - self.player.rect.centerx) >= 600 and abs(obj.y - self.player.rect.centery) >= 600:
                     self.spawn_positions.append((obj.x, obj.y))
 
     def bullet_collision(self):
@@ -116,13 +116,32 @@ class Game:
     def show_game_over_screen(self):
         image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
         self.display_surface.blit(self.game_over_image, image_rect)
+
+        # Restart seçeneği ekleyelim (Klavyeden 'R' tuşuna basınca yeniden başlasın)
+        font = pygame.font.Font(None, 50)
+        restart_text = font.render('Click to Restart', True, (255, 255, 255))
+        restart_rect = restart_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 100))
+        self.display_surface.blit(restart_text, restart_rect)
+        
         pygame.display.update()
-        pygame.time.wait(3000)
+
+        return restart_rect
+
+    def restart_game(self):
+        # Oyunun başladığı duruma geri dönecek şekilde her şeyi sıfırlıyoruz
+        self.game_over = False
+        self.all_sprites.empty()
+        self.collision_sprites.empty()
+        self.bullet_sprites.empty()
+        self.enemy_sprites.empty()
+        
+        self.setup()
 
     def run(self):
         while self.running:
             dt = self.clock.tick() / 1000
 
+            restart_rect = None
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -134,6 +153,10 @@ class Game:
                         player=self.player,
                         collision_sprites=self.collision_sprites
                     )
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.game_over:
+                        if restart_rect and restart_rect.collidepoint(event.pos):
+                            self.restart_game()
 
             if not self.game_over:
                 self.gun_timer()
@@ -147,8 +170,7 @@ class Game:
                 self.player.draw_health_bar(self.display_surface)
                 pygame.display.update()
             else:
-                self.show_game_over_screen()
-                self.running = False
+                restart_rect = self.show_game_over_screen()
 
         pygame.quit()
 
