@@ -4,10 +4,6 @@
   Python & Pygame ile geliştirilmiş arcade tarzı bir hayatta kalma oyunudur. Oyuncu, gelen düşmanlara karşı hayatta kalmaya çalışır, ateş ederek onları yok eder ve mümkün olduğunca uzun süre dayanır.
 </p>
 
-<p align="center">
-  <img src="images/ig/gameplay_sample.png" alt="Survivor Gameplay" width="600"/>
-</p>
-
 ---
 
 ## 📌 Özellikler
