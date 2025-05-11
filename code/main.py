@@ -41,7 +41,7 @@ class Game:
         self.music.set_volume(0.5)
 
         # Game over görseli
-        self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig', 'gameover.png')).convert_alpha()
+        self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig','oyunSonu', 'gameover.png')).convert_alpha()
         self.game_over_image = pygame.transform.scale(self.game_over_image, (400, 150))
 
         self.load_images()
