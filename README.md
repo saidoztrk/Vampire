@@ -1,4 +1,4 @@
-<h1 align="center">🧟 Survivor - 2D Hayatta Kalma Oyunu</h1>
+<h1 align="center">🧟 Vampire Survivors - 2D Hayatta Kalma Oyunu</h1>
 
 <p align="center">
   Python & Pygame ile geliştirilmiş arcade tarzı bir hayatta kalma oyunudur. Oyuncu, gelen düşmanlara karşı hayatta kalmaya çalışır, ateş ederek onları yok eder ve mümkün olduğunca uzun süre dayanır.
