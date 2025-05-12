@@ -46,7 +46,7 @@ class Game:
 
         self.load_images()
         self.setup()
-
+    
     def load_images(self):
         base_path = dirname(dirname(abspath(__file__)))
         self.bullet_surf = pygame.image.load(join(base_path, 'images', 'gun', 'bullet.png')).convert_alpha()
@@ -113,6 +113,27 @@ class Game:
             if self.player.health <= 0:
                 self.game_over = True
 
+    def draw_health_bar(self):
+        """
+        Oyuncunun can barını çizer.
+        """
+        health_ratio = self.player.health / self.player.max_health
+        bar_x = 20  # Can barı ekranın sol üst köşesinde
+        bar_y = 20
+        bar_width = 200  # Can barının genişliği
+        bar_height = 20  # Can barının yüksekliği
+
+        # Arka plan (kırmızı)
+        bg_rect = pygame.Rect(bar_x, bar_y, bar_width, bar_height)
+        pygame.draw.rect(self.display_surface, 'red', bg_rect)
+
+        # Dolan kısım (yeşil)
+        fg_rect = pygame.Rect(bar_x, bar_y, bar_width * health_ratio, bar_height)
+        pygame.draw.rect(self.display_surface, 'green', fg_rect)
+
+        # Çerçeve (siyah)
+        pygame.draw.rect(self.display_surface, 'black', bg_rect, 2)
+
     def show_game_over_screen(self):
         image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
         self.display_surface.blit(self.game_over_image, image_rect)
@@ -167,7 +188,7 @@ class Game:
 
                 self.display_surface.fill('black')
                 self.all_sprites.draw(self.player.rect.center)
-                self.player.draw_health_bar(self.display_surface)
+                self.draw_health_bar()  # Can barını çiz
                 pygame.display.update()
             else:
                 restart_rect = self.show_game_over_screen()
