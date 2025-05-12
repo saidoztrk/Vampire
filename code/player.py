@@ -16,11 +16,13 @@ class Player(pygame.sprite.Sprite):
         self.speed = 500
         self.collision_sprites = collision_sprites
 
+        # Sağlık ve başlangıç pozisyonu
         self.max_health = 100
         self.health = self.max_health
         self.health_bar_length = 100
         self.health_bar_height = 10
         self.health_bar_offset = pygame.Vector2(0, -40)
+        self.starting_position = pos  # Oyuncunun başlangıç pozisyonunu kaydetme
 
     def load_images(self):
         self.frames = {'left': [], 'right': [], 'up': [], 'down': []}
@@ -78,6 +80,14 @@ class Player(pygame.sprite.Sprite):
         if self.health < 0:
             self.health = 0
             self.kill()
+
+    def reset(self):
+        """
+        Oyuncunun başlangıç değerlerini sıfırla.
+        """
+        self.health = self.max_health
+        self.rect.center = self.starting_position
+        self.hitbox_rect.center = self.starting_position
 
     def update(self, dt):
         self.input()
