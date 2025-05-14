@@ -3,7 +3,7 @@ from player import Player
 from sprites import *
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-from random import randint, choice
+from random import choice
 from os.path import dirname, abspath, join
 import pygame
 import os
@@ -39,14 +39,28 @@ class Game:
         self.impact_sound = pygame.mixer.Sound(join(base_path, 'audio', 'impact.ogg'))
         self.music = pygame.mixer.Sound(join(base_path, 'audio', 'music.wav'))
         self.music.set_volume(0.5)
+        self.music.play(loops=-1)
 
         # Game over görseli
-        self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig','oyunSonu', 'gameover.png')).convert_alpha()
+        self.game_over_image = pygame.image.load(join(base_path, 'images', 'ig', 'oyunSonu', 'gameover.png')).convert_alpha()
         self.game_over_image = pygame.transform.scale(self.game_over_image, (400, 150))
+
+        # Return butonu görseli
+        self.return_image = pygame.image.load(join(base_path, 'images', 'ig', 'oyunSonu', 'return.png')).convert_alpha()
+        self.return_image = pygame.transform.scale(self.return_image, (100, 100))
+
+        # Sağlık görselleri
+        self.health_images = [
+            pygame.transform.scale(
+                pygame.image.load(join(base_path, 'images', 'health', f'health{i}.png')).convert_alpha(),
+                (200, 200)
+            )
+            for i in range(4)
+        ]
 
         self.load_images()
         self.setup()
-    
+
     def load_images(self):
         base_path = dirname(dirname(abspath(__file__)))
         self.bullet_surf = pygame.image.load(join(base_path, 'images', 'gun', 'bullet.png')).convert_alpha()
@@ -55,7 +69,7 @@ class Game:
         for folder in folders:
             for folder_path, _, file_names in os.walk(join(base_path, 'images', 'enemies', folder)):
                 self.enemy_frames[folder] = []
-                for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])): 
+                for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
                     full_path = join(folder_path, file_name)
                     surf = pygame.image.load(full_path).convert_alpha()
                     self.enemy_frames[folder].append(surf)
@@ -87,13 +101,13 @@ class Game:
         for obj in map.get_layer_by_name('Collisions'):
             CollisionSprite((obj.x, obj.y), pygame.Surface((obj.width, obj.height)), self.collision_sprites)
 
-        # Spawn pozisyonlarını filtreleme (600 piksel uzaklık)
         for obj in map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+                self.player.health = 3
+                self.player.max_health = 3
                 self.gun = Gun(self.player, self.all_sprites)
             else:
-                # Spawn pozisyonunun 600 pikselden uzak olmasını sağlamak
                 if abs(obj.x - self.player.rect.centerx) >= 600 and abs(obj.y - self.player.rect.centery) >= 600:
                     self.spawn_positions.append((obj.x, obj.y))
 
@@ -109,60 +123,48 @@ class Game:
 
     def player_collision(self):
         if pygame.sprite.spritecollide(self.player, self.enemy_sprites, False, pygame.sprite.collide_mask):
-            self.player.take_damage(20)
+            self.player.health -= 1
             if self.player.health <= 0:
+                self.player.health = 0
                 self.game_over = True
+            for enemy in self.enemy_sprites:
+                if pygame.sprite.collide_mask(self.player, enemy):
+                    enemy.kill()
 
     def draw_health_bar(self):
-        """
-        Oyuncunun can barını çizer.
-        """
-        health_ratio = self.player.health / self.player.max_health
-        bar_x = 20  # Can barı ekranın sol üst köşesinde
-        bar_y = 20
-        bar_width = 200  # Can barının genişliği
-        bar_height = 20  # Can barının yüksekliği
-
-        # Arka plan (kırmızı)
-        bg_rect = pygame.Rect(bar_x, bar_y, bar_width, bar_height)
-        pygame.draw.rect(self.display_surface, 'red', bg_rect)
-
-        # Dolan kısım (yeşil)
-        fg_rect = pygame.Rect(bar_x, bar_y, bar_width * health_ratio, bar_height)
-        pygame.draw.rect(self.display_surface, 'green', fg_rect)
-
-        # Çerçeve (siyah)
-        pygame.draw.rect(self.display_surface, 'black', bg_rect, 2)
+        health_index = max(0, min(3, self.player.health))
+        health_image = self.health_images[health_index]
+        self.display_surface.blit(health_image, (20, 20))
 
     def show_game_over_screen(self):
         image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
         self.display_surface.blit(self.game_over_image, image_rect)
 
-        # Restart seçeneği ekleyelim (Klavyeden 'R' tuşuna basınca yeniden başlasın)
         font = pygame.font.Font(None, 50)
         restart_text = font.render('Click to Restart', True, (255, 255, 255))
         restart_rect = restart_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 100))
         self.display_surface.blit(restart_text, restart_rect)
-        
-        pygame.display.update()
 
+        # return.png görselini ekle (yazının altına)
+        return_rect = self.return_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 200))
+        self.display_surface.blit(self.return_image, return_rect)
+
+        pygame.display.update()
         return restart_rect
 
     def restart_game(self):
-        # Oyunun başladığı duruma geri dönecek şekilde her şeyi sıfırlıyoruz
         self.game_over = False
         self.all_sprites.empty()
         self.collision_sprites.empty()
         self.bullet_sprites.empty()
         self.enemy_sprites.empty()
-        
         self.setup()
 
     def run(self):
         while self.running:
             dt = self.clock.tick() / 1000
-
             restart_rect = None
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -185,10 +187,9 @@ class Game:
                 self.all_sprites.update(dt)
                 self.bullet_collision()
                 self.player_collision()
-
                 self.display_surface.fill('black')
                 self.all_sprites.draw(self.player.rect.center)
-                self.draw_health_bar()  # Can barını çiz
+                self.draw_health_bar()
                 pygame.display.update()
             else:
                 restart_rect = self.show_game_over_screen()
@@ -196,7 +197,7 @@ class Game:
         pygame.quit()
 
 
-# PROGRAM BAŞLATMA KONTROLÜ
+# Ana çalıştırıcı
 if __name__ == '__main__':
     game = Game()
     game.run()
