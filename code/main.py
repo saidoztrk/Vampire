@@ -140,7 +140,8 @@ class Game:
         image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50))
         self.display_surface.blit(self.game_over_image, image_rect)
 
-        return_rect = self.return_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 80))
+        return_rect = self.return_image.get_rect(topleft=(460, 250))
+
         self.display_surface.blit(self.return_image, return_rect)
 
         pygame.display.update()
