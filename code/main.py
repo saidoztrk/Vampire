@@ -11,6 +11,14 @@ import os
 class Game:
     def __init__(self):
         pygame.init()
+
+        # BASE PATH
+        base_path = dirname(dirname(abspath(__file__)))
+
+        self.score = 0  #skor
+        # Pikselli yazı tipi yüklendi
+        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 10) 
+
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Survivor')
         self.clock = pygame.time.Clock()
@@ -30,8 +38,9 @@ class Game:
         pygame.time.set_timer(self.enemy_event, 300)
         self.spawn_positions = []
 
-        # BASE PATH
-        base_path = dirname(dirname(abspath(__file__)))
+        self.score = 0  #skor
+        # Pikselli yazı tipi yüklendi
+        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 50)
 
         # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
@@ -119,6 +128,7 @@ class Game:
                     self.impact_sound.play()
                     for sprite in collision_sprites:
                         sprite.destroy()
+                        self.score += 100  # Skor artırır
                     bullet.kill()
 
     def player_collision(self):
@@ -136,6 +146,11 @@ class Game:
         health_image = self.health_images[health_index]
         self.display_surface.blit(health_image, (20, 20))
 
+    def draw_score(self):  #Skoru ekrana çizdiren metod
+        score_surf = self.font.render(f'Score: {self.score}', True, (255, 255, 255))
+        self.display_surface.blit(score_surf, (20,20))
+    
+
     def show_game_over_screen(self):
         image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50))
         self.display_surface.blit(self.game_over_image, image_rect)
@@ -144,11 +159,17 @@ class Game:
 
         self.display_surface.blit(self.return_image, return_rect)
 
+        # Skor yazısı
+        score_text = self.font.render(f'Score: {self.score}', True, (255, 255, 255))
+        score_rect = score_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 130))
+        self.display_surface.blit(score_text, score_rect)
+
         pygame.display.update()
         return return_rect
 
     def restart_game(self):
         self.game_over = False
+        self.score = 0  #Skor sıfırlanır
         self.all_sprites.empty()
         self.collision_sprites.empty()
         self.bullet_sprites.empty()
@@ -184,6 +205,7 @@ class Game:
                 self.display_surface.fill('black')
                 self.all_sprites.draw(self.player.rect.center)
                 self.draw_health_bar()
+                self.draw_score()  #skor metodu çağrılıyor
                 pygame.display.update()
             else:
                 return_rect = self.show_game_over_screen()
