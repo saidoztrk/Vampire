@@ -47,7 +47,7 @@ class Game:
 
         # Return butonu görseli
         self.return_image = pygame.image.load(join(base_path, 'images', 'ig', 'oyunSonu', 'return.png')).convert_alpha()
-        self.return_image = pygame.transform.scale(self.return_image, (150, 70)) #boyuuuuuuuuuuuuuuuuuuuuut
+        self.return_image = pygame.transform.scale(self.return_image, (500, 400)) #boyuuuuuuuuuuuuuuuuuuuuut
 
         # Sağlık görselleri
         self.health_images = [
