@@ -47,7 +47,7 @@ class Game:
 
         # Return butonu görseli
         self.return_image = pygame.image.load(join(base_path, 'images', 'ig', 'oyunSonu', 'return.png')).convert_alpha()
-        self.return_image = pygame.transform.scale(self.return_image, (100, 100))
+        self.return_image = pygame.transform.scale(self.return_image, (150, 70)) #boyuuuuuuuuuuuuuuuuuuuuut
 
         # Sağlık görselleri
         self.health_images = [
@@ -137,20 +137,14 @@ class Game:
         self.display_surface.blit(health_image, (20, 20))
 
     def show_game_over_screen(self):
-        image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+        image_rect = self.game_over_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50))
         self.display_surface.blit(self.game_over_image, image_rect)
 
-        font = pygame.font.Font(None, 50)
-        restart_text = font.render('Click to Restart', True, (255, 255, 255))
-        restart_rect = restart_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 100))
-        self.display_surface.blit(restart_text, restart_rect)
-
-        # return.png görselini ekle (yazının altına)
-        return_rect = self.return_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 200))
+        return_rect = self.return_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 80))
         self.display_surface.blit(self.return_image, return_rect)
 
         pygame.display.update()
-        return restart_rect
+        return return_rect
 
     def restart_game(self):
         self.game_over = False
@@ -161,9 +155,9 @@ class Game:
         self.setup()
 
     def run(self):
+        return_rect = None
         while self.running:
             dt = self.clock.tick() / 1000
-            restart_rect = None
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -177,9 +171,8 @@ class Game:
                         collision_sprites=self.collision_sprites
                     )
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.game_over:
-                        if restart_rect and restart_rect.collidepoint(event.pos):
-                            self.restart_game()
+                    if self.game_over and return_rect and return_rect.collidepoint(event.pos):
+                        self.restart_game()
 
             if not self.game_over:
                 self.gun_timer()
@@ -192,7 +185,7 @@ class Game:
                 self.draw_health_bar()
                 pygame.display.update()
             else:
-                restart_rect = self.show_game_over_screen()
+                return_rect = self.show_game_over_screen()
 
         pygame.quit()
 
