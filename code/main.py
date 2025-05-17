@@ -40,10 +40,6 @@ class Game:
         pygame.time.set_timer(self.enemy_event, 300)
         self.spawn_positions = []
 
- #       self.score = 0  #skor
-        # Pikselli yazı tipi yüklendi
- #       self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 25)
-
         # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
         self.shoot_sound.set_volume(0.2)
@@ -156,6 +152,10 @@ class Game:
     def draw_score(self):  #Skoru ekrana çizdiren metod
         score_surf = self.font.render(f'Score: {self.score}', True, (255, 255, 255))
         self.display_surface.blit(score_surf, (20,20))
+
+        # High Score
+        high_score_surf = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 0))
+        self.display_surface.blit(high_score_surf, (20, 50))
     
 
     def show_game_over_screen(self):
