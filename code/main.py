@@ -128,7 +128,7 @@ class Game:
                     self.impact_sound.play()
                     for sprite in collision_sprites:
                         sprite.destroy()
-                        self.score += 100  # Skor artırır
+                        self.score += 10  # Skor artırır
                     bullet.kill()
 
     def player_collision(self):

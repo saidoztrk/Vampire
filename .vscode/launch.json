@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/pc/AppData/Local/Temp/e098fd0e-0922-4c6b-a3c6-06f9c262ba10_ÇizimDili[1].zip.ÇizimDili[1].zip/ÇizimDili",
+      "program": "c:/Users/pc/AppData/Local/Temp/e098fd0e-0922-4c6b-a3c6-06f9c262ba10_ÇizimDili[1].zip.ÇizimDili[1].zip/ÇizimDili/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
