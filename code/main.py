@@ -190,7 +190,7 @@ class Game:
         self.display_surface.blit(score_text, score_rect)
 
          # High score
-        high_score_text = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 0))
+        high_score_text = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 255))
         high_score_rect = high_score_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 160))
         self.display_surface.blit(high_score_text, high_score_rect)
 
