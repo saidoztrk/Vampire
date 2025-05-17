@@ -40,7 +40,7 @@ class Game:
 
         self.score = 0  #skor
         # Pikselli yazı tipi yüklendi
-        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 50)
+        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 20)
 
         # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
