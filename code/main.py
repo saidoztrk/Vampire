@@ -16,8 +16,10 @@ class Game:
         base_path = dirname(dirname(abspath(__file__)))
 
         self.score = 0  #skor
+        self.high_score = 0
+
         # Pikselli yazı tipi yüklendi
-        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 10) 
+        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 25) 
 
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Survivor')
@@ -38,9 +40,9 @@ class Game:
         pygame.time.set_timer(self.enemy_event, 300)
         self.spawn_positions = []
 
-        self.score = 0  #skor
+ #       self.score = 0  #skor
         # Pikselli yazı tipi yüklendi
-        self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 50)
+ #       self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 25)
 
         # Ses dosyaları
         self.shoot_sound = pygame.mixer.Sound(join(base_path, 'audio', 'shoot.wav'))
@@ -137,6 +139,11 @@ class Game:
             if self.player.health <= 0:
                 self.player.health = 0
                 self.game_over = True
+
+                # High score kontrolü
+                if self.score > self.high_score:
+                   self.high_score = self.score
+
             for enemy in self.enemy_sprites:
                 if pygame.sprite.collide_mask(self.player, enemy):
                     enemy.kill()
@@ -164,10 +171,20 @@ class Game:
         score_rect = score_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 130))
         self.display_surface.blit(score_text, score_rect)
 
+         # High score
+        high_score_text = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 0))
+        high_score_rect = high_score_text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 160))
+        self.display_surface.blit(high_score_text, high_score_rect)
+
+
         pygame.display.update()
         return return_rect
 
     def restart_game(self):
+
+        if self.score > self.high_score:
+           self.high_score = self.score  # yüksek skoru güncelle
+
         self.game_over = False
         self.score = 0  #Skor sıfırlanır
         self.all_sprites.empty()
