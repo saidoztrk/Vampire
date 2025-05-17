@@ -14,9 +14,11 @@ class Game:
 
         # BASE PATH
         base_path = dirname(dirname(abspath(__file__)))
+        # High-Score dosyası oluşturma
+        self.high_score_path = join(base_path, 'high_score.txt')  
+        self.high_score = self.load_high_score()
 
-        self.score = 0  #skor
-        self.high_score = 0
+        self.score = 0  #skord
 
         # Pikselli yazı tipi yüklendi
         self.font = pygame.font.Font(join(base_path, 'fonts', 'PressStart2P.ttf'), 25) 
@@ -67,6 +69,22 @@ class Game:
 
         self.load_images()
         self.setup()
+
+# High-Score Fonksiyonları
+    def load_high_score(self):
+         if os.path.exists(self.high_score_path):
+            try:
+                with open(self.high_score_path, 'r') as file:
+                    return int(file.read())
+            except ValueError:
+                return 0
+         return 0
+    
+    def save_high_score(self):
+         with open(self.high_score_path, 'w') as file:
+            file.write(str(self.high_score))
+# High-Score Fonksiyonları Sonu          
+
 
     def load_images(self):
         base_path = dirname(dirname(abspath(__file__)))
@@ -154,7 +172,7 @@ class Game:
         self.display_surface.blit(score_surf, (20,20))
 
         # High Score
-        high_score_surf = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 0))
+        high_score_surf = self.font.render(f'High Score: {self.high_score}', True, (255, 255, 255))
         self.display_surface.blit(high_score_surf, (20, 50))
     
 
@@ -228,6 +246,7 @@ class Game:
                 return_rect = self.show_game_over_screen()
 
         pygame.quit()
+        self.save_high_score()
 
 
 # Ana çalıştırıcı
